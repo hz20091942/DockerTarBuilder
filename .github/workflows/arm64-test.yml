@@ -29,9 +29,9 @@ jobs:
           docker pull "${image}" --platform "linux/amd64"
           image_name="${image//\//_}"
           image_name="${image_name//:/_}"
-          docker save "${image}" -o "/mnt/docker-tmp/${image_name}-amd64.tar"
-          gzip -c "/mnt/docker-tmp/${image_name}-amd64.tar" > "/mnt/docker-tmp/${image_name}-amd64.tar.gz"
+          docker save "${image}" | gzip > "/mnt/docker-tmp/${image_name}-amd64.tar.gz"
           rm "/mnt/docker-tmp/${image_name}-amd64.tar"
+          docker rmi "${image}"
         done
 
     - name: Upload artifact
