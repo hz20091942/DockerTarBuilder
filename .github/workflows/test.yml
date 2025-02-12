@@ -1,0 +1,25 @@
+name: test
+on:
+  workflow_dispatch:
+
+jobs:
+  show:
+    name: show info
+    runs-on: ubuntu-22.04
+    steps:
+      - name: workspace
+        run: | 
+          echo "workspace"
+          ls ${{ github.workspace }}
+          echo "root"
+          cd /
+          ls 
+          echo "home"
+          cd /home
+          ls
+          echo "df -h"
+          df -h
+          echo "lsblk"
+          lsblk
+
+        
