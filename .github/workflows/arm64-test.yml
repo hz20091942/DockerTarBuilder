@@ -1,0 +1,46 @@
+name: x86-64 Pull and Save Docker Image
+on:
+  workflow_dispatch:
+    inputs:
+      docker_images:
+        description: '请填写docker镜像名称 多个用英文逗号分开'
+        required: true
+        default: 'alpine:latest,busybox:stable-glibc'  # 设置默认的 Docker 镜像列表
+
+jobs:
+  pull_and_package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Use /mnt for Docker operations
+      run: |
+        sudo mkdir -p /mnt/docker-tmp
+        sudo chmod 777 /mnt/docker-tmp
+        export DOCKER_TMPDIR=/mnt/docker-tmp
+
+    - name: Pull Docker Images and Package
+      run: |
+        images="${{ github.event.inputs.docker_images }}"
+        IFS=',' read -r -a image_array <<< "$images"
+        for image in "${image_array[@]}"; do
+          docker pull "${image}" --platform "linux/amd64"
+          image_name="${image//\//_}"
+          image_name="${image_name//:/_}"
+          docker save "${image}" -o "/mnt/docker-tmp/${image_name}-amd64.tar"
+          gzip -c "/mnt/docker-tmp/${image_name}-amd64.tar" > "/mnt/docker-tmp/${image_name}-amd64.tar.gz"
+          rm "/mnt/docker-tmp/${image_name}-amd64.tar"
+        done
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: /mnt/docker-tmp/*.tar.gz
+        retention-days: 1
+    
+    - name: Clean up /mnt
+      run: |
+        sudo rm -rf /mnt/docker-tmp/*
