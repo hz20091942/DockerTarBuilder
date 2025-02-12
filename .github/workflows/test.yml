@@ -11,15 +11,8 @@ jobs:
         run: | 
           echo "workspace"
           ls ${{ github.workspace }}
-          echo "root"
-          cd /
-          ls 
-          echo "home"
-          cd /home
-          ls
-          echo "df -h"
-          df -h
-          echo "lsblk"
-          lsblk
+          echo
+          echo "df -h /home"
+          df -h /home
 
         
