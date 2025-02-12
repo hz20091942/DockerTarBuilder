@@ -12,7 +12,10 @@ jobs:
           echo "workspace"
           ls ${{ github.workspace }}
           echo
-          echo "df -h /home"
-          df -h /home
+          echo "df -h"
+          df -h 
+          echo
+          echo "lsblk"
+          lsblk
 
         
